@@ -166,21 +166,22 @@ app.post('/download', (req, res) => {
  */
 // Full Resolution (Merged) Download Route - Updated
 // Full Resolution (Merged) Download Route
+// Full Resolution (Merged) Download Route with Save-As feature
 app.post('/download-full', (req, res) => {
-  const { url } = req.body;
+  const { url, saveName } = req.body;
   if (!url) {
     return res.render('index', { videoUrl: null, error: 'URL is required' });
   }
+  // Extract a video ID from the URL or use current timestamp if extraction fails.
   const videoId = extractVideoId(url) || Date.now();
-  const outputTemplate = path.join(downloadsDir, `${videoId}.mp4`);
+  // Use user-specified file name if provided; otherwise, default to videoId.
+  const fileName = saveName && saveName.trim() !== "" ? saveName.trim() : videoId;
+  const outputTemplate = path.join(downloadsDir, `${fileName}.mp4`);
 
-  // Explicitly tell yt-dlp where ffmpeg is located (adjust the path if needed)
-  // We are not filtering the audio stream by extension so it can pick the best available audio.
-  // This command will merge the best video (in mp4) and best audio (any container) into one mp4 file.
-  const command = `python -m yt_dlp --ffmpeg-location "C:\\ffmpeg2025\\bin" -f "bestvideo[ext=mp4]+bestaudio" --merge-output-format mp4 -o "${downloadsDir}/${videoId}.%(ext)s" "${url}"`;
-  
+  // Command with explicit ffmpeg location.
+  const command = `python -m yt_dlp --ffmpeg-location "C:\\ffmpeg2025\\bin" -f "bestvideo[ext=mp4]+bestaudio" --merge-output-format mp4 -o "${downloadsDir}/${fileName}.%(ext)s" "${url}"`;
   console.log("Merging command:", command);
-  
+
   exec(command, (error, stdout, stderr) => {
     if (error) {
       console.error(`Merge error: ${error.message}`);
@@ -191,10 +192,12 @@ app.post('/download-full', (req, res) => {
       console.error("Merged file not found:", outputTemplate);
       return res.render('index', { videoUrl: null, error: "Merged file not found." });
     }
-    const fileUrl = `/downloads/${videoId}.mp4`;
+    // Provide a link to the merged file
+    const fileUrl = `/downloads/${fileName}.mp4`;
     res.render('player', { videoUrl: fileUrl });
   });
 });
+
 
 
 
