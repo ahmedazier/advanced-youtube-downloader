@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced YouTube Downloader</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body class="light-mode" id="body">
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="mb-0">Advanced YouTube Downloader & Player</h1>
+      <button class="btn btn-outline-secondary" id="toggleThemeBtn">Dark Mode</button>
+    </div>
+    
+    <% if (error) { %>
+      <div class="alert alert-danger"><%= error %></div>
+    <% } %>
+    
+    <!-- Show Info (thumbnail, title, etc.) -->
+    <div class="mb-4">
+      <h3>Check Video Info</h3>
+      <div class="input-group mb-2">
+        <input type="text" id="infoUrl" class="form-control" placeholder="Enter YouTube URL">
+        <button id="getInfoBtn" class="btn btn-secondary">Show Info</button>
+      </div>
+      <div id="infoResult" class="mb-3"></div>
+    </div>
+    
+    <hr>
+    
+    <!-- Progressive Download Form -->
+    <form action="/download" method="POST" class="mb-4">
+      <h3>Progressive Download (Fast)</h3>
+      <div class="mb-3">
+        <label for="url" class="form-label">YouTube URL</label>
+        <input type="text" name="url" id="url" class="form-control" placeholder="Enter YouTube URL" required>
+      </div>
+      <div class="mb-3">
+        <label for="resolution" class="form-label">Select Resolution</label>
+        <select name="resolution" id="resolution" class="form-select">
+          <option value="360">360p (Format 18)</option>
+          <option value="720" selected>720p (Format 22/18)</option>
+          <option value="1080">1080p (Format 37/22/18)</option>
+          <option value="best">Best (1080 → 720 → 360)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Download & Play (Progressive)</button>
+    </form>
+    
+    <hr>
+    
+    <!-- Full Resolution Download Form (Merged) -->
+    <form action="/download-full" method="POST" class="mb-4">
+      <h3>Full Resolution Download (Merged)</h3>
+      <div class="mb-3">
+        <label for="fullUrl" class="form-label">YouTube URL</label>
+        <input type="text" name="url" id="fullUrl" class="form-control" placeholder="Enter YouTube URL" required>
+      </div>
+      <button type="submit" class="btn btn-danger">Download & Play (Merged)</button>
+    </form>
+    
+    <hr>
+    <a href="/downloads" class="btn btn-info">Manage Downloads</a>
+  </div>
+
+  <!-- Bootstrap + Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Dark Mode Toggle
+    const body = document.getElementById('body');
+    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
+    toggleThemeBtn.addEventListener('click', () => {
+      body.classList.toggle('dark-mode');
+      body.classList.toggle('light-mode');
+      toggleThemeBtn.textContent = body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+    });
+
+    // Show Info via AJAX
+    const getInfoBtn = document.getElementById('getInfoBtn');
+    const infoUrl = document.getElementById('infoUrl');
+    const infoResult = document.getElementById('infoResult');
+    
+    getInfoBtn.addEventListener('click', async () => {
+      if (!infoUrl.value) {
+        alert('Please enter a YouTube URL');
+        return;
+      }
+      try {
+        const response = await fetch('/api/get-info', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: infoUrl.value })
+        });
+        const data = await response.json();
+        if (data.error) {
+          infoResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        } else {
+          // Show title, thumbnail, and duration
+          infoResult.innerHTML = `
+            <div class="card" style="max-width: 500px;">
+              <img src="${data.thumbnail}" class="card-img-top" alt="Thumbnail">
+              <div class="card-body">
+                <h5 class="card-title">${data.title}</h5>
+                <p class="card-text">Duration: ${data.duration}</p>
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        infoResult.innerHTML = `<div class="alert alert-danger">Request failed.</div>`;
+      }
+    });
+  </script>
+</body>
+</html>

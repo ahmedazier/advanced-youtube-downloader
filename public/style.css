@@ -1,0 +1,47 @@
+/* public/style.css */
+
+/* Default Light Theme */
+body.light-mode {
+    background-color: #f8f9fa;
+    color: #212529;
+  }
+  
+  /* Dark Theme */
+  body.dark-mode {
+    background-color: #343a40;
+    color: #f8f9fa;
+  }
+  
+  /* Override some Bootstrap components in dark mode */
+  .dark-mode .form-control {
+    background-color: #495057;
+    color: #fff;
+    border: 1px solid #6c757d;
+  }
+  
+  .dark-mode .form-select {
+    background-color: #495057;
+    color: #fff;
+    border: 1px solid #6c757d;
+  }
+  
+  .dark-mode .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
+  .dark-mode .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+  }
+  
+  .dark-mode .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+  }
+  
+  .dark-mode a.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+  
