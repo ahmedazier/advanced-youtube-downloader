@@ -42,12 +42,14 @@
 
     <!-- Video Info Preview -->
     <div class="mb-5">
-      <h3 class="mb-3">Check Video Info</h3>
+      <h3 class="mb-3">Check Video Info & Available Formats</h3>
       <div class="input-group mb-2">
         <input type="text" id="infoUrl" class="form-control" placeholder="Enter YouTube URL">
         <button id="getInfoBtn" class="btn btn-secondary">Show Info</button>
+        <button id="checkFormatsBtn" class="btn btn-info">Check Available Formats</button>
       </div>
       <div id="infoResult"></div>
+      <div id="formatsResult"></div>
     </div>
 
     <hr>
@@ -55,7 +57,7 @@
     <!-- Progressive Download Form -->
     <div class="mb-5">
       <h3>Progressive Download (Fast)</h3>
-      <form action="/download" method="POST">
+      <form id="progressiveForm">
         <div class="mb-3">
           <label for="url" class="form-label">YouTube URL</label>
           <input type="text" name="url" id="url" class="form-control" placeholder="Enter YouTube URL" required>
@@ -63,14 +65,18 @@
         <div class="mb-3">
           <label for="resolution" class="form-label">Select Resolution</label>
           <select name="resolution" id="resolution" class="form-select">
-            <option value="360">360p (Format 18)</option>
-            <option value="720" selected>720p (Format 22/18)</option>
-            <option value="1080">1080p (Format 37/22/18)</option>
-            <option value="best">Best (1080 → 720 → 360)</option>
+            <option value="360">360p (Low Quality)</option>
+            <option value="720">720p (Medium Quality)</option>
+            <option value="1080">1080p (High Quality)</option>
+            <option value="1440">1440p (2K Quality)</option>
+            <option value="2160">2160p (4K Quality)</option>
+            <option value="highest" selected>Highest Available (Best Quality)</option>
+            <option value="best">Best (Fallback Options)</option>
           </select>
         </div>
         <button type="submit" class="btn btn-primary btn-custom">Download & Play (Progressive)</button>
       </form>
+      <div id="progressiveResult"></div>
     </div>
 
     <hr>
@@ -78,10 +84,22 @@
     <!-- Full Resolution Download Form (Merged) -->
     <div class="mb-5">
       <h3>Full Resolution Download (Merged)</h3>
-      <form action="/download-full" method="POST">
+      <form id="fullDownloadForm">
         <div class="mb-3">
           <label for="fullUrl" class="form-label">YouTube URL</label>
           <input type="text" name="url" id="fullUrl" class="form-control" placeholder="Enter YouTube URL" required>
+        </div>
+        <div class="mb-3">
+          <label for="fullResolution" class="form-label">Select Resolution</label>
+          <select name="resolution" id="fullResolution" class="form-select">
+            <option value="360">360p (Low Quality)</option>
+            <option value="720">720p (Medium Quality)</option>
+            <option value="1080">1080p (High Quality)</option>
+            <option value="1440">1440p (2K Quality)</option>
+            <option value="2160">2160p (4K Quality)</option>
+            <option value="highest" selected>Highest Available (Best Quality)</option>
+            <option value="best">Best (Fallback Options)</option>
+          </select>
         </div>
         <div class="mb-3">
           <label for="saveName" class="form-label">Save As (Optional)</label>
@@ -89,6 +107,7 @@
         </div>
         <button type="submit" class="btn btn-danger btn-custom">Download & Play (Merged)</button>
       </form>
+      <div id="fullDownloadResult"></div>
     </div>
   </div>
 
@@ -105,8 +124,10 @@
 
     // Video Info AJAX Request
     const getInfoBtn = document.getElementById('getInfoBtn');
+    const checkFormatsBtn = document.getElementById('checkFormatsBtn');
     const infoUrl = document.getElementById('infoUrl');
     const infoResult = document.getElementById('infoResult');
+    const formatsResult = document.getElementById('formatsResult');
     
     getInfoBtn.addEventListener('click', async () => {
       if (!infoUrl.value) {
@@ -135,6 +156,168 @@
         }
       } catch (err) {
         infoResult.innerHTML = `<div class="alert alert-danger">Request failed.</div>`;
+      }
+    });
+    
+    // Check Formats AJAX Request
+    checkFormatsBtn.addEventListener('click', async () => {
+      if (!infoUrl.value) {
+        alert('Please enter a YouTube URL');
+        return;
+      }
+      try {
+        const response = await fetch('/api/check-formats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: infoUrl.value })
+        });
+        const data = await response.json();
+        if (data.error) {
+          formatsResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        } else {
+          let formatsHtml = `
+            <div class="alert alert-success">
+              <h5>Available Formats</h5>
+              <p><strong>Highest Quality Available:</strong> ${data.highestQuality}</p>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Format</th>
+                      <th>Resolution</th>
+                      <th>Size</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+          `;
+          
+          data.formats.forEach(format => {
+            formatsHtml += `
+              <tr>
+                <td>${format.id}</td>
+                <td>${format.ext}</td>
+                <td>${format.resolution}</td>
+                <td>${format.size}</td>
+                <td>${format.note}</td>
+              </tr>
+            `;
+          });
+          
+          formatsHtml += `
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+          
+          formatsResult.innerHTML = formatsHtml;
+        }
+      } catch (err) {
+        formatsResult.innerHTML = `<div class="alert alert-danger">Request failed.</div>`;
+      }
+    });
+
+    // Progressive Download Form
+    const progressiveForm = document.getElementById('progressiveForm');
+    const progressiveResult = document.getElementById('progressiveResult');
+    
+    progressiveForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log('Progressive Download form submitted');
+      
+      const url = document.getElementById('url').value;
+      const resolution = document.getElementById('resolution').value;
+      
+      console.log('URL:', url);
+      console.log('Resolution:', resolution);
+      
+      if (!url) {
+        alert('Please enter a YouTube URL');
+        return;
+      }
+      
+      progressiveResult.innerHTML = '<div class="alert alert-info">Processing...</div>';
+      
+      try {
+        console.log('Sending request to /api/progressive-download');
+        const response = await fetch('/api/progressive-download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, resolution })
+        });
+        console.log('Response received:', response.status);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.error) {
+          progressiveResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        } else {
+          progressiveResult.innerHTML = `
+            <div class="alert alert-success">
+              <h5>Download URL Ready!</h5>
+              <p>Click the button below to download and play:</p>
+              <a href="${data.downloadUrl}" class="btn btn-success" target="_blank">Download & Play</a>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        progressiveResult.innerHTML = `<div class="alert alert-danger">Request failed: ${err.message}</div>`;
+      }
+    });
+
+    // Full Download Form
+    const fullDownloadForm = document.getElementById('fullDownloadForm');
+    const fullDownloadResult = document.getElementById('fullDownloadResult');
+    
+    fullDownloadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      console.log('Full Download form submitted');
+      
+      const url = document.getElementById('fullUrl').value;
+      const resolution = document.getElementById('fullResolution').value;
+      const saveName = document.getElementById('saveName').value;
+      
+      console.log('URL:', url);
+      console.log('Resolution:', resolution);
+      console.log('Save Name:', saveName);
+      
+      if (!url) {
+        alert('Please enter a YouTube URL');
+        return;
+      }
+      
+      fullDownloadResult.innerHTML = '<div class="alert alert-info">Processing...</div>';
+      
+      try {
+        console.log('Sending request to /api/full-download');
+        const response = await fetch('/api/full-download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, resolution, saveName })
+        });
+        console.log('Response received:', response.status);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (data.error) {
+          fullDownloadResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+        } else {
+          fullDownloadResult.innerHTML = `
+            <div class="alert alert-success">
+              <h5>Download Started!</h5>
+              <p>File: ${data.fileName}</p>
+              <p>Status: ${data.status}</p>
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        fullDownloadResult.innerHTML = `<div class="alert alert-danger">Request failed: ${err.message}</div>`;
       }
     });
   </script>
