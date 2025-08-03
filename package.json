@@ -17,7 +17,7 @@
     "yt-dlp",
     "ffmpeg"
   ],
-  "author": "Your Name",
+  "author": "Ahmed Azier",
   "license": "MIT",
   "dependencies": {
     "axios": "^1.11.0",

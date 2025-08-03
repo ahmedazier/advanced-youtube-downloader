@@ -63,7 +63,7 @@ sudo apt install ffmpeg
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/advanced-youtube-downloader.git
+   git clone https://github.com/ahmedazier/advanced-youtube-downloader.git
    cd advanced-youtube-downloader
    ```
 
@@ -277,9 +277,20 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Bootstrap**: UI framework
 - **Font Awesome**: Icons
 
+## 👨‍💻 Author
+
+**Ahmed Azier** - [@ahmedazier](https://github.com/ahmedazier)
+
+Programmer, photographer, and creator. Working at the sweet spot between beauty and elegance to answer design problems with honest solutions.
+
+- 🌐 **Website**: [ahmedazier.com](https://www.ahmedazier.com/)
+- 💼 **Company**: [MaffeiTech](https://maffeitech.com/)
+- 🔗 **LinkedIn**: [in/ahmedazier](https://linkedin.com/in/ahmedazier)
+- 📍 **Location**: Dubai, UAE
+
 ## 📞 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/advanced-youtube-downloader/issues)
+- **Issues**: [GitHub Issues](https://github.com/ahmedazier/advanced-youtube-downloader/issues)
 - **Documentation**: Check the [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for common solutions
 - **Testing**: Use the provided test scripts to verify functionality
 
