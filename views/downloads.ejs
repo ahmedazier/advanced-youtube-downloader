@@ -1,71 +1,324 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <title>Manage Downloads</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Downloads - Advanced YouTube Downloader</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="/style.css" rel="stylesheet">
 </head>
-<body class="light-mode" id="body">
+<body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-      <a class="navbar-brand" href="/">YouTube Downloader</a>
+      <a class="navbar-brand" href="/">
+        <i class="fab fa-youtube"></i>
+        <span>YouTube Downloader</span>
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <button class="btn btn-outline-light ms-3" id="toggleThemeBtn">Dark Mode</button>
+            <a class="nav-link" href="/">
+              <i class="fas fa-home me-1"></i>Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="/downloads">
+              <i class="fas fa-download me-1"></i>Downloads
+            </a>
+          </li>
+          <li class="nav-item">
+            <button class="theme-toggle" id="themeToggle">
+              <i class="fas fa-moon" id="themeIcon"></i>
+              <span id="themeText">Dark Mode</span>
+            </button>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container py-5">
-    <h1 class="mb-4">Downloaded Videos</h1>
-    <% if (files.length === 0) { %>
-      <p>No downloaded videos found.</p>
-    <% } else { %>
-      <table class="table table-hover">
-        <thead>
-          <tr>
-            <th>Filename</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% files.forEach(file => { %>
-            <tr>
-              <td><%= file %></td>
-              <td>
-                <a href="/downloads/<%= file %>" target="_blank" class="btn btn-sm btn-success">Play</a>
-                <form action="/delete-file" method="POST" style="display:inline-block;">
-                  <input type="hidden" name="filename" value="<%= file %>">
-                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                </form>
-              </td>
-            </tr>
-          <% }) %>
-        </tbody>
-      </table>
-    <% } %>
-    <a href="/" class="btn btn-primary">Back to Home</a>
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="container">
+        <h1><i class="fas fa-download me-3"></i>Your Downloads</h1>
+        <p>Manage and access all your downloaded YouTube videos in one place.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="downloads-container">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3><i class="fas fa-folder-open me-2"></i>Downloaded Files</h3>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-outline-secondary" id="refreshBtn">
+            <i class="fas fa-sync-alt me-1"></i>Refresh
+          </button>
+          <button class="btn btn-sm btn-danger" id="clearAllBtn">
+            <i class="fas fa-trash me-1"></i>Clear All
+          </button>
+        </div>
+      </div>
+      
+      <% if (files && files.length > 0) { %>
+        <div class="row">
+          <% files.forEach(function(file, index) { %>
+            <div class="col-md-6 col-lg-4 mb-4">
+              <div class="download-card">
+                <div class="download-card-header">
+                  <div class="file-icon">
+                    <i class="fas fa-video"></i>
+                  </div>
+                                     <div class="file-info">
+                     <h6 class="file-name"><%= file %></h6>
+                     <div class="file-meta">
+                       <span class="file-type">MP4 Video</span>
+                       <span class="file-size" data-filename="<%= file %>">Calculating...</span>
+                     </div>
+                     <div class="video-details" data-filename="<%= file %>">
+                       <div class="detail-item">
+                         <span class="detail-label">Resolution:</span>
+                         <span class="detail-value resolution">Loading...</span>
+                       </div>
+                       <div class="detail-item">
+                         <span class="detail-label">Bitrate:</span>
+                         <span class="detail-value bitrate">Loading...</span>
+                       </div>
+                       <div class="detail-item">
+                         <span class="detail-label">Frame Rate:</span>
+                         <span class="detail-value frameRate">Loading...</span>
+                       </div>
+                       <div class="detail-item">
+                         <span class="detail-label">Codec:</span>
+                         <span class="detail-value codec">Loading...</span>
+                       </div>
+                     </div>
+                   </div>
+                </div>
+                <div class="download-card-actions">
+                  <a href="/downloads/<%= file %>" class="btn btn-sm btn-primary" target="_blank" title="Download">
+                    <i class="fas fa-download"></i>
+                  </a>
+                  <a href="/player/<%= file %>" class="btn btn-sm btn-success" title="Play">
+                    <i class="fas fa-play"></i>
+                  </a>
+                  <button class="btn btn-sm btn-outline-danger delete-btn" data-filename="<%= file %>" title="Delete">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        
+        <div class="downloads-summary">
+          <div class="row text-center">
+            <div class="col-md-4">
+              <div class="summary-item">
+                <i class="fas fa-video fa-2x text-primary mb-2"></i>
+                <h5><%= files.length %></h5>
+                <p class="text-muted">Total Videos</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="summary-item">
+                <i class="fas fa-hdd fa-2x text-success mb-2"></i>
+                <h5 id="totalSize">Calculating...</h5>
+                <p class="text-muted">Total Size</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="summary-item">
+                <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                <h5 id="lastDownload">-</h5>
+                <p class="text-muted">Last Download</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="empty-state">
+          <div class="empty-icon">
+            <i class="fas fa-folder-open"></i>
+          </div>
+          <h4>No Downloads Yet</h4>
+          <p class="text-muted">Start downloading videos to see them here!</p>
+          <a href="/" class="btn btn-primary">
+            <i class="fas fa-arrow-left me-1"></i>Go to Downloader
+          </a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Delete File</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete <strong id="deleteFileName"></strong>?</p>
+          <p class="text-muted small">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Dark Mode Toggle (re-use same code)
-    const body = document.getElementById('body');
-    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-    if (toggleThemeBtn) {
-      toggleThemeBtn.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        body.classList.toggle('light-mode');
-        toggleThemeBtn.textContent = body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+    // Theme Toggle
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    
+    // Check for saved theme preference or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', currentTheme);
+    updateThemeUI(currentTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeUI(newTheme);
+    });
+    
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeText.textContent = 'Light Mode';
+      } else {
+        themeIcon.className = 'fas fa-moon';
+        themeText.textContent = 'Dark Mode';
+      }
+    }
+
+    // File size and metadata calculation
+    async function calculateFileSizes() {
+      const sizeElements = document.querySelectorAll('.file-size');
+      const videoDetails = document.querySelectorAll('.video-details');
+      let totalSize = 0;
+      
+      for (let i = 0; i < sizeElements.length; i++) {
+        const element = sizeElements[i];
+        const detailsElement = videoDetails[i];
+        const filename = element.dataset.filename;
+        
+        try {
+          const response = await fetch(`/api/file-info?filename=${encodeURIComponent(filename)}`);
+          if (!response.ok) {
+            throw new Error('File not found');
+          }
+          const data = await response.json();
+          
+          // Update file size
+          if (data.sizeFormatted) {
+            element.textContent = data.sizeFormatted;
+            totalSize += data.size;
+          } else {
+            element.textContent = 'Unknown';
+          }
+          
+          // Update video metadata
+          if (detailsElement && data) {
+            const resolutionEl = detailsElement.querySelector('.resolution');
+            const bitrateEl = detailsElement.querySelector('.bitrate');
+            const frameRateEl = detailsElement.querySelector('.frameRate');
+            const codecEl = detailsElement.querySelector('.codec');
+            
+            if (resolutionEl) resolutionEl.textContent = data.resolution || '-';
+            if (bitrateEl) bitrateEl.textContent = data.bitrate || '-';
+            if (frameRateEl) frameRateEl.textContent = data.frameRate || '-';
+            if (codecEl) codecEl.textContent = data.codec || '-';
+          }
+        } catch (error) {
+          console.error('Error getting file info:', error);
+          element.textContent = 'Unknown';
+          
+          // Set metadata to unknown if error
+          if (detailsElement) {
+            const detailValues = detailsElement.querySelectorAll('.detail-value');
+            detailValues.forEach(el => el.textContent = '-');
+          }
+        }
+      }
+      
+      // Update total size
+      const totalSizeElement = document.getElementById('totalSize');
+      if (totalSize > 0) {
+        const totalSizeInMB = (totalSize / (1024 * 1024)).toFixed(1);
+        totalSizeElement.textContent = `${totalSizeInMB} MB`;
+      }
+    }
+
+    // Delete functionality
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    const deleteFileName = document.getElementById('deleteFileName');
+    const confirmDelete = document.getElementById('confirmDelete');
+    
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const filename = button.dataset.filename;
+        deleteFileName.textContent = filename;
+        confirmDelete.dataset.filename = filename;
+        deleteModal.show();
       });
+    });
+    
+    confirmDelete.addEventListener('click', async () => {
+      const filename = confirmDelete.dataset.filename;
+      try {
+        const response = await fetch('/delete-file', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename })
+        });
+        
+        if (response.ok) {
+          deleteModal.hide();
+          location.reload();
+        } else {
+          alert('Failed to delete file');
+        }
+      } catch (error) {
+        alert('Error deleting file');
+      }
+    });
+
+    // Refresh button
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      location.reload();
+    });
+
+    // Clear all button
+    document.getElementById('clearAllBtn').addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete all downloaded files? This cannot be undone.')) {
+        // Implementation for clearing all files
+        alert('Clear all functionality would be implemented here');
+      }
+    });
+
+    // Calculate file sizes on page load
+    if (document.querySelectorAll('.file-size').length > 0) {
+      calculateFileSizes();
     }
   </script>
 </body>

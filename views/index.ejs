@@ -1,26 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Advanced YouTube Downloader</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="/style.css" rel="stylesheet">
 </head>
-<body class="light-mode" id="body">
+<body>
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container">
-      <a class="navbar-brand" href="/">YouTube Downloader</a>
+      <a class="navbar-brand" href="/">
+        <i class="fab fa-youtube"></i>
+        <span>YouTube Downloader</span>
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon" style="filter: invert(1);"></span>
+        <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="/downloads">Downloads</a>
+            <a class="nav-link" href="/downloads">
+              <i class="fas fa-download me-1"></i>Downloads
+            </a>
           </li>
           <li class="nav-item">
-            <button class="btn btn-outline-light ms-3" id="toggleThemeBtn">Dark Mode</button>
+            <button class="theme-toggle" id="themeToggle">
+              <i class="fas fa-moon" id="themeIcon"></i>
+              <span id="themeText">Dark Mode</span>
+            </button>
           </li>
         </ul>
       </div>
@@ -29,98 +40,191 @@
 
   <!-- Hero Section -->
   <div class="hero">
-    <div class="container">
-      <h1>Advanced YouTube Downloader</h1>
-      <p>Download, merge, and play your favorite YouTube videos in high resolution.</p>
+    <div class="hero-content">
+      <div class="container">
+        <h1><i class="fab fa-youtube me-3"></i>Advanced YouTube Downloader</h1>
+        <p>Download your favorite YouTube videos in the highest quality available with our modern, fast, and reliable downloader.</p>
+        
+        <div class="hero-stats">
+          <div class="stat-item">
+            <span class="stat-number">4K</span>
+            <span class="stat-label">Max Quality</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">∞</span>
+            <span class="stat-label">Videos</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">⚡</span>
+            <span class="stat-label">Fast</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <div class="container">
     <% if (error) { %>
-      <div class="alert alert-danger text-center"><%= error %></div>
+      <div class="alert alert-danger text-center">
+        <i class="fas fa-exclamation-triangle me-2"></i><%= error %>
+      </div>
     <% } %>
 
-    <!-- Video Info Preview -->
-    <div class="mb-5">
-      <h3 class="mb-3">Check Video Info & Available Formats</h3>
-      <div class="input-group mb-2">
-        <input type="text" id="infoUrl" class="form-control" placeholder="Enter YouTube URL">
-        <button id="getInfoBtn" class="btn btn-secondary">Show Info</button>
-        <button id="checkFormatsBtn" class="btn btn-info">Check Available Formats</button>
+    <!-- Video Info & Format Check Section -->
+    <div class="card">
+      <h3><i class="fas fa-info-circle"></i>Video Information & Format Analysis</h3>
+      <p>Analyze any YouTube video to see available formats and quality options before downloading.</p>
+      <div class="row">
+        <div class="col-md-8">
+          <div class="input-group mb-3">
+            <input type="text" id="infoUrl" class="form-control" placeholder="Enter YouTube URL to analyze...">
+            <button id="getInfoBtn" class="btn btn-secondary">
+              <i class="fas fa-search me-1"></i>Get Info
+            </button>
+            <button id="checkFormatsBtn" class="btn btn-info">
+              <i class="fas fa-list me-1"></i>Check Formats
+            </button>
+          </div>
+        </div>
       </div>
       <div id="infoResult"></div>
       <div id="formatsResult"></div>
     </div>
 
-    <hr>
-
-    <!-- Progressive Download Form -->
-    <div class="mb-5">
-      <h3>Progressive Download (Fast)</h3>
+    <!-- Progressive Download Section -->
+    <div class="card">
+      <h3><i class="fas fa-bolt"></i>Quick Download (Progressive)</h3>
+      <p>Fast download with direct video URL - perfect for quick access and streaming.</p>
       <form id="progressiveForm">
-        <div class="mb-3">
-          <label for="url" class="form-label">YouTube URL</label>
-          <input type="text" name="url" id="url" class="form-control" placeholder="Enter YouTube URL" required>
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label for="url" class="form-label">YouTube URL</label>
+              <input type="text" name="url" id="url" class="form-control" placeholder="Enter YouTube URL" required>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="resolution" class="form-label">Quality</label>
+              <select name="resolution" id="resolution" class="form-select">
+                <option value="360">360p (Low)</option>
+                <option value="720">720p (Medium)</option>
+                <option value="1080">1080p (High)</option>
+                <option value="1440">1440p (2K)</option>
+                <option value="2160">2160p (4K)</option>
+                <option value="highest" selected>Highest Available</option>
+                <option value="best">Best (Fallback)</option>
+              </select>
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="resolution" class="form-label">Select Resolution</label>
-          <select name="resolution" id="resolution" class="form-select">
-            <option value="360">360p (Low Quality)</option>
-            <option value="720">720p (Medium Quality)</option>
-            <option value="1080">1080p (High Quality)</option>
-            <option value="1440">1440p (2K Quality)</option>
-            <option value="2160">2160p (4K Quality)</option>
-            <option value="highest" selected>Highest Available (Best Quality)</option>
-            <option value="best">Best (Fallback Options)</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary btn-custom">Download & Play (Progressive)</button>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-download me-1"></i>Download & Play
+        </button>
       </form>
       <div id="progressiveResult"></div>
     </div>
 
-    <hr>
-
-    <!-- Full Resolution Download Form (Merged) -->
-    <div class="mb-5">
-      <h3>Full Resolution Download (Merged)</h3>
+    <!-- Full Download Section -->
+    <div class="card">
+      <h3><i class="fas fa-film"></i>High Quality Download (Merged)</h3>
+      <p>Download with best video + audio quality and save to your device with FFmpeg merging.</p>
       <form id="fullDownloadForm">
-        <div class="mb-3">
-          <label for="fullUrl" class="form-label">YouTube URL</label>
-          <input type="text" name="url" id="fullUrl" class="form-control" placeholder="Enter YouTube URL" required>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="fullUrl" class="form-label">YouTube URL</label>
+              <input type="text" name="url" id="fullUrl" class="form-control" placeholder="Enter YouTube URL" required>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <label for="fullResolution" class="form-label">Quality</label>
+              <select name="resolution" id="fullResolution" class="form-select">
+                <option value="360">360p (Low)</option>
+                <option value="720">720p (Medium)</option>
+                <option value="1080">1080p (High)</option>
+                <option value="1440">1440p (2K)</option>
+                <option value="2160">2160p (4K)</option>
+                <option value="highest" selected>Highest Available</option>
+                <option value="best">Best (Fallback)</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="mb-3">
+              <label for="saveName" class="form-label">Custom Name (Optional)</label>
+              <input type="text" name="saveName" id="saveName" class="form-control" placeholder="Custom filename">
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="fullResolution" class="form-label">Select Resolution</label>
-          <select name="resolution" id="fullResolution" class="form-select">
-            <option value="360">360p (Low Quality)</option>
-            <option value="720">720p (Medium Quality)</option>
-            <option value="1080">1080p (High Quality)</option>
-            <option value="1440">1440p (2K Quality)</option>
-            <option value="2160">2160p (4K Quality)</option>
-            <option value="highest" selected>Highest Available (Best Quality)</option>
-            <option value="best">Best (Fallback Options)</option>
-          </select>
-        </div>
-        <div class="mb-3">
-          <label for="saveName" class="form-label">Save As (Optional)</label>
-          <input type="text" name="saveName" id="saveName" class="form-control" placeholder="Enter desired file name (without extension)">
-        </div>
-        <button type="submit" class="btn btn-danger btn-custom">Download & Play (Merged)</button>
+        <button type="submit" class="btn btn-danger">
+          <i class="fas fa-download me-1"></i>Download & Save
+        </button>
       </form>
       <div id="fullDownloadResult"></div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="card">
+      <h3><i class="fas fa-star"></i>Features</h3>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="text-center mb-3">
+            <i class="fas fa-tachometer-alt fa-2x text-primary mb-2"></i>
+            <h5>High Speed</h5>
+            <p class="text-muted">Fast downloads with optimized performance</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="text-center mb-3">
+            <i class="fas fa-hd-video fa-2x text-success mb-2"></i>
+            <h5>High Quality</h5>
+            <p class="text-muted">Up to 4K resolution support</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="text-center mb-3">
+            <i class="fas fa-shield-alt fa-2x text-info mb-2"></i>
+            <h5>Safe & Secure</h5>
+            <p class="text-muted">No ads, no tracking, just downloads</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Dark Mode Toggle
-    const body = document.getElementById('body');
-    const toggleThemeBtn = document.getElementById('toggleThemeBtn');
-    toggleThemeBtn.addEventListener('click', () => {
-      body.classList.toggle('dark-mode');
-      body.classList.toggle('light-mode');
-      toggleThemeBtn.textContent = body.classList.contains('dark-mode') ? 'Light Mode' : 'Dark Mode';
+    // Theme Toggle
+    const html = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    
+    // Check for saved theme preference or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    html.setAttribute('data-theme', currentTheme);
+    updateThemeUI(currentTheme);
+    
+    themeToggle.addEventListener('click', () => {
+      const currentTheme = html.getAttribute('data-theme');
+      const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeUI(newTheme);
     });
+    
+    function updateThemeUI(theme) {
+      if (theme === 'dark') {
+        themeIcon.className = 'fas fa-sun';
+        themeText.textContent = 'Light Mode';
+      } else {
+        themeIcon.className = 'fas fa-moon';
+        themeText.textContent = 'Dark Mode';
+      }
+    }
 
     // Video Info AJAX Request
     const getInfoBtn = document.getElementById('getInfoBtn');
@@ -131,54 +235,62 @@
     
     getInfoBtn.addEventListener('click', async () => {
       if (!infoUrl.value) {
-        alert('Please enter a YouTube URL');
+        showAlert('Please enter a YouTube URL', 'warning');
         return;
       }
+      
       try {
+        showLoading(infoResult, 'Getting video information...');
         const response = await fetch('/api/get-info', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: infoUrl.value })
         });
         const data = await response.json();
+        
         if (data.error) {
-          infoResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          showAlert(data.error, 'danger', infoResult);
         } else {
           infoResult.innerHTML = `
-            <div class="card mx-auto" style="max-width: 500px;">
-              <img src="${data.thumbnail}" class="card-img-top" alt="Thumbnail">
+            <div class="video-info-card mx-auto" style="max-width: 500px;">
+              <img src="${data.thumbnail}" class="card-img-top" alt="Video Thumbnail">
               <div class="card-body">
                 <h5 class="card-title">${data.title}</h5>
-                <p class="card-text">Duration: ${data.duration}</p>
+                <p class="card-text">
+                  <i class="fas fa-clock me-1"></i>Duration: ${data.duration}
+                </p>
               </div>
             </div>
           `;
         }
       } catch (err) {
-        infoResult.innerHTML = `<div class="alert alert-danger">Request failed.</div>`;
+        showAlert('Request failed. Please try again.', 'danger', infoResult);
       }
     });
     
     // Check Formats AJAX Request
     checkFormatsBtn.addEventListener('click', async () => {
       if (!infoUrl.value) {
-        alert('Please enter a YouTube URL');
+        showAlert('Please enter a YouTube URL', 'warning');
         return;
       }
+      
       try {
+        showLoading(formatsResult, 'Analyzing available formats...');
         const response = await fetch('/api/check-formats', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: infoUrl.value })
         });
         const data = await response.json();
+        
         if (data.error) {
-          formatsResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          showAlert(data.error, 'danger', formatsResult);
         } else {
           let formatsHtml = `
             <div class="alert alert-success">
-              <h5>Available Formats</h5>
-              <p><strong>Highest Quality Available:</strong> ${data.highestQuality}</p>
+              <h5><i class="fas fa-list me-2"></i>Available Formats</h5>
+              <p><strong>Highest Quality Available:</strong> <span class="badge badge-primary">${data.highestQuality}</span></p>
               <div class="table-responsive">
                 <table class="table table-sm">
                   <thead>
@@ -196,9 +308,9 @@
           data.formats.forEach(format => {
             formatsHtml += `
               <tr>
-                <td>${format.id}</td>
+                <td><code>${format.id}</code></td>
                 <td>${format.ext}</td>
-                <td>${format.resolution}</td>
+                <td><span class="badge badge-primary">${format.resolution}</span></td>
                 <td>${format.size}</td>
                 <td>${format.note}</td>
               </tr>
@@ -215,7 +327,7 @@
           formatsResult.innerHTML = formatsHtml;
         }
       } catch (err) {
-        formatsResult.innerHTML = `<div class="alert alert-danger">Request failed.</div>`;
+        showAlert('Request failed. Please try again.', 'danger', formatsResult);
       }
     });
 
@@ -225,47 +337,40 @@
     
     progressiveForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('Progressive Download form submitted');
       
       const url = document.getElementById('url').value;
       const resolution = document.getElementById('resolution').value;
       
-      console.log('URL:', url);
-      console.log('Resolution:', resolution);
-      
       if (!url) {
-        alert('Please enter a YouTube URL');
+        showAlert('Please enter a YouTube URL', 'warning');
         return;
       }
       
-      progressiveResult.innerHTML = '<div class="alert alert-info">Processing...</div>';
-      
       try {
-        console.log('Sending request to /api/progressive-download');
+        showLoading(progressiveResult, 'Getting download URL...');
         const response = await fetch('/api/progressive-download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url, resolution })
         });
-        console.log('Response received:', response.status);
         
         const data = await response.json();
-        console.log('Response data:', data);
         
         if (data.error) {
-          progressiveResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          showAlert(data.error, 'danger', progressiveResult);
         } else {
           progressiveResult.innerHTML = `
             <div class="alert alert-success">
-              <h5>Download URL Ready!</h5>
+              <h5><i class="fas fa-check-circle me-2"></i>Download Ready!</h5>
               <p>Click the button below to download and play:</p>
-              <a href="${data.downloadUrl}" class="btn btn-success" target="_blank">Download & Play</a>
+              <a href="${data.downloadUrl}" class="btn btn-success" target="_blank">
+                <i class="fas fa-play me-1"></i>Download & Play
+              </a>
             </div>
           `;
         }
       } catch (err) {
-        console.error('Error:', err);
-        progressiveResult.innerHTML = `<div class="alert alert-danger">Request failed: ${err.message}</div>`;
+        showAlert('Request failed. Please try again.', 'danger', progressiveResult);
       }
     });
 
@@ -275,51 +380,77 @@
     
     fullDownloadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      console.log('Full Download form submitted');
       
       const url = document.getElementById('fullUrl').value;
       const resolution = document.getElementById('fullResolution').value;
       const saveName = document.getElementById('saveName').value;
       
-      console.log('URL:', url);
-      console.log('Resolution:', resolution);
-      console.log('Save Name:', saveName);
-      
       if (!url) {
-        alert('Please enter a YouTube URL');
+        showAlert('Please enter a YouTube URL', 'warning');
         return;
       }
       
-      fullDownloadResult.innerHTML = '<div class="alert alert-info">Processing...</div>';
-      
       try {
-        console.log('Sending request to /api/full-download');
+        showLoading(fullDownloadResult, 'Downloading and processing video...');
         const response = await fetch('/api/full-download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url, resolution, saveName })
         });
-        console.log('Response received:', response.status);
         
         const data = await response.json();
-        console.log('Response data:', data);
         
         if (data.error) {
-          fullDownloadResult.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+          showAlert(data.error, 'danger', fullDownloadResult);
         } else {
           fullDownloadResult.innerHTML = `
             <div class="alert alert-success">
-              <h5>Download Started!</h5>
-              <p>File: ${data.fileName}</p>
-              <p>Status: ${data.status}</p>
+              <h5><i class="fas fa-check-circle me-2"></i>Download Complete!</h5>
+              <p><strong>File:</strong> ${data.fileName}</p>
+              <p><strong>Status:</strong> ${data.status}</p>
+              <a href="${data.filePath}" class="btn btn-success" target="_blank">
+                <i class="fas fa-download me-1"></i>Download File
+              </a>
             </div>
           `;
         }
       } catch (err) {
-        console.error('Error:', err);
-        fullDownloadResult.innerHTML = `<div class="alert alert-danger">Request failed: ${err.message}</div>`;
+        showAlert('Request failed. Please try again.', 'danger', fullDownloadResult);
       }
     });
+
+    // Utility Functions
+    function showAlert(message, type, container = null) {
+      const alertHtml = `
+        <div class="alert alert-${type}">
+          <i class="fas fa-${type === 'danger' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'} me-2"></i>
+          ${message}
+        </div>
+      `;
+      
+      if (container) {
+        container.innerHTML = alertHtml;
+      } else {
+        // Show as toast notification
+        const toast = document.createElement('div');
+        toast.className = `alert alert-${type} toast`;
+        toast.innerHTML = alertHtml;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          document.body.removeChild(toast);
+        }, 5000);
+      }
+    }
+
+    function showLoading(container, message) {
+      container.innerHTML = `
+        <div class="alert alert-info text-center">
+          <div class="loading me-2"></div>
+          ${message}
+        </div>
+      `;
+    }
   </script>
 </body>
 </html>
